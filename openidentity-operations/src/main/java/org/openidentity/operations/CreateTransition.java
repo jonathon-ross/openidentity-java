@@ -3,7 +3,7 @@ package org.openidentity.operations;
 import java.util.List;
 import java.util.Objects;
 import org.openidentity.cbor.OpenIdentityCborEncoder;
-import org.openidentity.core.IdentityStateV1;
+import org.openidentity.core.IdentityStateV1;\nimport org.openidentity.core.OpenIdentityError;\nimport org.openidentity.core.OpenIdentityException;
 import org.openidentity.core.IdentityStatus;
 import org.openidentity.core.StateHash;
 import org.openidentity.crypto.PolicyVerifier;
@@ -19,7 +19,7 @@ public final class CreateTransition {
         byte[] operationBytes = operation.encode();
         byte[] signingInput = SigningInputs.operation(operationBytes);
         if (!PolicyVerifier.verify(operation.controllerPolicy(), signingInput, authorizationProofs)) {
-            throw new IllegalArgumentException("CREATE authorization does not satisfy proposed ControllerPolicy");
+            throw new OpenIdentityException(OpenIdentityError.CONTROLLER_THRESHOLD_NOT_SATISFIED, "CREATE authorization does not satisfy proposed ControllerPolicy");
         }
         return new IdentityStateV1(
                 operation.identity(),
