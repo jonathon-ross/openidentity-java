@@ -9,5 +9,5 @@ public final class OpenIdentityCredential{
   this.id=id.clone();this.issuer=issuer;this.issuanceStateHash=issuanceStateHash;this.validFrom=validFrom;this.validUntil=validUntil;this.profile=profile;this.subject=subject.clone();this.claims=Map.copyOf(claims);
  }
  public byte[] encode(){return OpenIdentityCborEncoder.encodeCredential(id,issuer,issuanceStateHash,validFrom,validUntil,profile,subject,claims);}
- public IdentityId issuer(){return issuer;}public StateHash issuanceStateHash(){return issuanceStateHash;}public Map<String,Object> claims(){return claims;}
+ public byte[] id(){return id.clone();}public IdentityId issuer(){return issuer;}public StateHash issuanceStateHash(){return issuanceStateHash;}public long validFrom(){return validFrom;}public Long validUntil(){return validUntil;}public String profile(){return profile;}public byte[] subject(){return subject.clone();}public Map<String,Object> claims(){return claims;}
 }
