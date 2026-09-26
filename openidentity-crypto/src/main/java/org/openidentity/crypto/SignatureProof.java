@@ -3,6 +3,7 @@ package org.openidentity.crypto;
 import java.util.Arrays;
 import java.util.Objects;
 import org.openidentity.core.VerificationMethodId;
+import org.openidentity.cbor.OpenIdentityCborEncoder;
 
 public final class SignatureProof {
     private final VerificationMethodId methodId;
@@ -16,6 +17,7 @@ public final class SignatureProof {
 
     public VerificationMethodId methodId() { return methodId; }
     public byte[] signature() { return signature.clone(); }
+    public byte[] encode() { return OpenIdentityCborEncoder.encodeSignatureProof(methodId.bytes(), signature); }
 
     @Override public boolean equals(Object other) {
         return other instanceof SignatureProof p && methodId.equals(p.methodId) && Arrays.equals(signature, p.signature);
