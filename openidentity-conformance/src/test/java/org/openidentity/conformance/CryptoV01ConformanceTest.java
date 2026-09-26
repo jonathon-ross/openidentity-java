@@ -14,6 +14,7 @@ import org.openidentity.crypto.Ed25519;
 import org.openidentity.crypto.MlDsa65;
 import org.openidentity.crypto.SigningInputs;
 import org.openidentity.core.Ed25519Key;
+import org.openidentity.core.VerificationMethodId;
 
 class CryptoV01ConformanceTest {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -42,6 +43,72 @@ class CryptoV01ConformanceTest {
                 signingInput, hex(v, "mlDsa65SignatureHex")));
         assertEquals(1952, hex(v, "mlDsa65PublicKeyHex").length);
         assertEquals(3309, hex(v, "mlDsa65SignatureHex").length);
+    }
+
+    @Test
+    void se02ThroughSe05AndSe10RejectOperationMutations() throws Exception {
+        JsonNode root = JSON.readTree(resource("signature-envelope-v0.1.json"));
+        JsonNode se01 = signatureVector(root, "SE01");
+        Ed25519Key key = Ed25519Key.of(hex(se01, "controllerPublicKeyHex"));
+        byte[] originalSignature = hex(se01, "authorizationSignatureHex");
+
+        for (String id : new String[]{"SE02", "SE03", "SE04", "SE05", "SE10"}) {
+            JsonNode v = signatureVector(root, id);
+            byte[] operation = hex(v, "operationBytesHex");
+            byte[] expectedInput = hex(v, "mutatedSigningInputHex");
+            assertArrayEquals(expectedInput, SigningInputs.operation(operation), id + " signing input");
+            assertFalse(Ed25519.verify(key, expectedInput, originalSignature), id + " must reject");
+        }
+    }
+
+    @Test
+    void se06RejectsOrdinaryAuthorizationAsControllerProof() throws Exception {
+        JsonNode root = JSON.readTree(resource("signature-envelope-v0.1.json"));
+        JsonNode se01 = signatureVector(root, "SE01");
+        JsonNode v = signatureVector(root, "SE06");
+        Ed25519Key key = Ed25519Key.of(hex(se01, "controllerPublicKeyHex"));
+        byte[] operation = hex(v, "operationBytesHex");
+        VerificationMethodId id = VerificationMethodId.of(hex(se01, "controllerMethodIdHex"));
+        byte[] required = SigningInputs.controllerProof(operation, id);
+        assertArrayEquals(hex(v, "requiredSigningInputHex"), required);
+        assertFalse(Ed25519.verify(key, required, hex(v, "substitutedSignatureHex")));
+    }
+
+    @Test
+    void se07RejectsControllerProofAsOrdinaryAuthorization() throws Exception {
+        JsonNode root = JSON.readTree(resource("signature-envelope-v0.1.json"));
+        JsonNode se01 = signatureVector(root, "SE01");
+        JsonNode v = signatureVector(root, "SE07");
+        Ed25519Key key = Ed25519Key.of(hex(se01, "controllerPublicKeyHex"));
+        byte[] required = SigningInputs.operation(hex(v, "operationBytesHex"));
+        assertArrayEquals(hex(v, "requiredSigningInputHex"), required);
+        assertFalse(Ed25519.verify(key, required, hex(v, "substitutedSignatureHex")));
+    }
+
+    @Test
+    void se08RejectsRecoveryAuthorizationAsOrdinaryAuthorization() throws Exception {
+        JsonNode root = JSON.readTree(resource("signature-envelope-v0.1.json"));
+        JsonNode se01 = signatureVector(root, "SE01");
+        JsonNode v = signatureVector(root, "SE08");
+        Ed25519Key key = Ed25519Key.of(hex(se01, "controllerPublicKeyHex"));
+        byte[] required = SigningInputs.operation(hex(v, "operationBytesHex"));
+        assertArrayEquals(hex(v, "requiredSigningInputHex"), required);
+        assertFalse(Ed25519.verify(key, required, hex(v, "substitutedSignatureHex")));
+    }
+
+    @Test
+    void se09RejectsSigningStructureVersionMutation() throws Exception {
+        JsonNode root = JSON.readTree(resource("signature-envelope-v0.1.json"));
+        JsonNode se01 = signatureVector(root, "SE01");
+        JsonNode v = signatureVector(root, "SE09");
+        Ed25519Key key = Ed25519Key.of(hex(se01, "controllerPublicKeyHex"));
+        byte[] mutated = hex(v, "mutatedSigningInputHex");
+        assertFalse(Ed25519.verify(key, mutated, hex(v, "authorizationSignatureHex")));
+    }
+
+    private static JsonNode signatureVector(JsonNode root, String id) {
+        for (JsonNode v : root.path("vectors")) if (id.equals(v.path("id").asText())) return v;
+        throw new AssertionError("Missing signature vector " + id);
     }
 
     private static JsonNode vector(String id) throws Exception {
