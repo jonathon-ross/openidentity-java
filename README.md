@@ -85,6 +85,20 @@ if (!result.valid()) {
 
 State-transition failures use `OpenIdentityException`, whose `error()` method returns the corresponding `OpenIdentityError` code.
 
+## API documentation
+
+Detailed usage documentation is available in [`docs/API_GUIDE.md`](docs/API_GUIDE.md). The build also produces Javadoc JARs for published modules. Public API Javadocs describe protocol semantics, parameters, return values, and protocol-aware failures.
+
+## Source formatting
+
+Java source formatting is enforced with Spotless and Google Java Format. To normalize the entire source tree before committing:
+
+```bash
+mvn spotless:apply
+```
+
+`mvn verify` runs `spotless:check`, so incorrectly formatted Java cannot pass the release gate.
+
 ## Build
 
 The project uses Maven and Java 21.
