@@ -7,6 +7,7 @@
  <dependencies>
   <dependency><groupId>org.openidentity</groupId><artifactId>openidentity-core</artifactId><version>${project.version}</version></dependency>
   <dependency><groupId>org.openidentity</groupId><artifactId>openidentity-cbor</artifactId><version>${project.version}</version></dependency>
+  <dependency><groupId>org.openidentity</groupId><artifactId>openidentity-crypto</artifactId><version>${project.version}</version></dependency>
   <dependency><groupId>com.fasterxml.jackson.core</groupId><artifactId>jackson-databind</artifactId><version>${jackson.version}</version><scope>test</scope></dependency>
   <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><scope>test</scope></dependency>
  </dependencies>
