@@ -52,7 +52,7 @@ final class CborReader {
       if (values.put(key, read()) != null)
         throw new IllegalArgumentException("Duplicate CBOR map key");
     }
-    return Map.copyOf(values);
+    return java.util.Collections.unmodifiableMap(values);
   }
 
   private byte[] bytes(int size) {
