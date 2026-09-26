@@ -17,7 +17,7 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
-    private static void encodePolicy(DeterministicCbor c, AuthorityPolicy policy) {
+    public static byte[] encodeControllerPolicy(ControllerPolicy policy) { DeterministicCbor c = new DeterministicCbor(); encodePolicy(c, policy); return c.toByteArray(); }\n\n    public static byte[] encodeVerificationMethod(VerificationMethod method) { DeterministicCbor c = new DeterministicCbor(); encodeMethod(c, method); return c.toByteArray(); }\n\n    private static void encodePolicy(DeterministicCbor c, AuthorityPolicy policy) {
         if (policy.isSingle()) {
             c.map(2); c.integer(1); c.integer(1); c.integer(2); c.array(1); encodeMethod(c, policy.methods().getFirst());
         } else {
