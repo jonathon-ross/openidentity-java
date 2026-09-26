@@ -1,0 +1,84 @@
+# OpenIdentity Java
+
+Production Java SDK for the OpenIdentity Protocol.
+
+This repository implements the frozen OpenIdentity Protocol **v0.1.0** as an independent consumer of the protocol specification and normative conformance artifacts.
+
+## Scope
+
+This repository contains production Java implementation code. It does **not** define or modify the OpenIdentity protocol.
+
+The canonical protocol is maintained separately in `jonathon-ross/OpenIdentity`. Protocol v0.1.0 is the initial conformance target.
+
+Product requirements must not silently redefine protocol semantics. If implementation work exposes a genuine protocol deficiency, that issue belongs in the protocol repository for explicit specification/version review.
+
+## Initial target
+
+The first SDK milestone is an end-to-end implementation of:
+
+```text
+Identity creation
+    -> CREATE
+    -> ROTATE_CONTROLLER
+    -> SET_ASSERTION_POLICY
+    -> credential issuance / verification
+    -> DEACTIVATE
+    -> RECOVER
+```
+
+The implementation will be continuously checked against the published OpenIdentity Protocol v0.1.0 normative vectors.
+
+## Design principles
+
+- Java 21 baseline.
+- Deterministic RFC 8949 CBOR for authoritative protocol bytes.
+- Protocol types are immutable.
+- Explicit separation of controller, assertion, and recovery authority.
+- Ed25519 and ML-DSA-65 support for the v0.1 conformance profile.
+- No silent cryptographic threshold weakening.
+- StateHash and signing-domain behavior must be byte-for-byte compatible with the normative protocol.
+- Protocol validation errors are explicit; malformed or unsupported input is not silently normalized.
+- No dependency on the protocol repository's Java vector-generator implementation.
+
+## Planned modules
+
+```text
+openidentity-core          protocol-domain types and invariants
+openidentity-cbor          deterministic encoding/decoding
+openidentity-crypto        keys, signatures, signing domains, proof verification
+openidentity-operations    operation construction and state transitions
+openidentity-credentials   native credentials and W3C projection
+openidentity-conformance   tests against Protocol v0.1.0 vectors
+```
+
+The module boundaries may evolve as the production API becomes clearer, but protocol semantics remain governed by the released specification.
+
+## Protocol baseline
+
+Target:
+
+```text
+OpenIdentity Protocol v0.1.0
+```
+
+Current operation schema in that release:
+
+```text
+spec/cddl/openidentity-operation-v2.cddl
+```
+
+The schema revision name `v2` is distinct from the signed operation envelope's `protocolVersion = 1`.
+
+## Build
+
+The project uses Maven and Java 21.
+
+```bash
+mvn clean verify
+```
+
+## License
+
+Licensed under the Apache License, Version 2.0.
+
+OpenIdentity branding and official protocol status are governed separately by the OpenIdentity protocol project's published trademark guidance.
