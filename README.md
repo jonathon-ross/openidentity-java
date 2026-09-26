@@ -82,3 +82,24 @@ mvn clean verify
 Licensed under the Apache License, Version 2.0.
 
 OpenIdentity branding and official protocol status are governed separately by the OpenIdentity protocol project's published trademark guidance.
+
+
+## Release verification
+
+The SDK targets the frozen OpenIdentity Protocol v0.1.1 release.
+
+Before tagging an SDK release, run:
+
+```bash
+./tools/release-gate.sh
+```
+
+On Windows PowerShell:
+
+```powershell
+mvn clean verify
+git diff --exit-code
+git status --porcelain
+```
+
+The Maven conformance suite independently verifies the SHA-256 manifests for every pinned normative v0.1.1 resource and exercises the protocol, cryptographic, operation, credential, recovery, and W3C projection vectors.
