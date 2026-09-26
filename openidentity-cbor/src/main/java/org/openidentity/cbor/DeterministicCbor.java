@@ -21,6 +21,8 @@ final class DeterministicCbor {
     void array(int size) { typeAndArgument(4, BigInteger.valueOf(size)); }
     void map(int size) { typeAndArgument(5, BigInteger.valueOf(size)); }
     void nil() { out.write(0xf6); }
+    void bool(boolean value) { out.write(value ? 0xf5 : 0xf4); }
+    void number(BigInteger value) { if (value.signum() >= 0) unsigned(value); else { BigInteger n = value.negate().subtract(BigInteger.ONE); if (n.bitLength() > 64) throw new IllegalArgumentException("CBOR integer out of range"); typeAndArgument(1, n); } }
     byte[] toByteArray() { return out.toByteArray(); }
 
     private void typeAndArgument(int major, BigInteger value) {
