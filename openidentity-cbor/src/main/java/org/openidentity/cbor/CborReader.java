@@ -49,8 +49,10 @@ final class CborReader {
     LinkedHashMap<Object, Object> values = new LinkedHashMap<>();
     for (int i = 0; i < size; i++) {
       Object key = read();
-      if (values.put(key, read()) != null)
+      if (values.containsKey(key)) {
         throw new IllegalArgumentException("Duplicate CBOR map key");
+      }
+      values.put(key, read());
     }
     return java.util.Collections.unmodifiableMap(values);
   }
