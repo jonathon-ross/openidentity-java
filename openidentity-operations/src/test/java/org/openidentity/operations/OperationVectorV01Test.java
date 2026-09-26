@@ -39,7 +39,7 @@ class OperationVectorV01Test {
         RotateControllerOperation op = new RotateControllerOperation(
                 IdentityId.of(hex(v,"identityHex")),
                 new Sequence(BigInteger.valueOf(v.path("sequence").asLong())),
-                StateHash.of(hex(v,"previousStateHashHex")),
+                new StateHash(MultihashSha256.of(hex(v,"previousStateHashHex"))),
                 new ControllerPolicy(2, List.of(ed, ml)));
         assertArrayEquals(hex(v,"operationBytesHex"), op.encode());
     }
