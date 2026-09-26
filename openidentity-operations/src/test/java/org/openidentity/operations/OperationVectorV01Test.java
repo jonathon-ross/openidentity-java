@@ -58,6 +58,31 @@ class OperationVectorV01Test {
     assertArrayEquals(hex(v, "operationBytesHex"), op.encode());
   }
 
+  @Test
+  void v02CreateDecodesAndReencodesByteForByte() throws Exception {
+    JsonNode v = vector("V02");
+    byte[] expected = hex(v, "operationBytesHex");
+    OpenIdentityOperation decoded = OpenIdentityOperationDecoder.decode(expected);
+    assertInstanceOf(CreateOperation.class, decoded);
+    assertArrayEquals(expected, decoded.encode());
+  }
+
+  @Test
+  void v04RotateDecodesAndReencodesByteForByte() throws Exception {
+    JsonNode v = vector("V04");
+    byte[] expected = hex(v, "operationBytesHex");
+    OpenIdentityOperation decoded = OpenIdentityOperationDecoder.decode(expected);
+    assertInstanceOf(RotateControllerOperation.class, decoded);
+    assertArrayEquals(expected, decoded.encode());
+  }
+
+  @Test
+  void operationDecoderRejectsTrailingBytes() throws Exception {
+    byte[] canonical = hex(vector("V02"), "operationBytesHex");
+    byte[] trailing = java.util.Arrays.copyOf(canonical, canonical.length + 1);
+    assertThrows(IllegalArgumentException.class, () -> OpenIdentityOperationDecoder.decode(trailing));
+  }
+
   private static byte[] extractNewMlDsaKey(JsonNode v) {
     String policy = v.path("newControllerPolicyHex").asText();
     if (policy.isEmpty()) policy = v.path("proposedControllerPolicyHex").asText();
