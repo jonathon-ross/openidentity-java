@@ -10,6 +10,7 @@ public final class RecoverTransition{
   if(current.recoveryCommitment()==null)throw new IllegalArgumentException("Current state has no recovery commitment");
   RecoveryCommitment revealed=new RecoveryCommitment(MultihashSha256.digest(OpenIdentityCborEncoder.encodeRecoveryPolicy(op.currentRecoveryPolicy())));
   if(!revealed.equals(current.recoveryCommitment()))throw new IllegalArgumentException("Revealed RecoveryPolicy does not match current commitment");
+  if(op.newRecoveryCommitment().equals(current.recoveryCommitment()))throw new IllegalArgumentException("New recovery commitment must rotate");
   byte[] bytes=op.encode();
   if(!RecoveryPolicyVerifier.verify(op.currentRecoveryPolicy(),bytes,recoveryProofs))throw new IllegalArgumentException("RecoveryPolicy authorization failed");
   if(!ProofOfPossessionVerifier.verifyAll(op.newControllerPolicy(),bytes,controllerPops))throw new IllegalArgumentException("New controller proof of possession failed");
