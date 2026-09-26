@@ -10,6 +10,9 @@ import java.security.MessageDigest;
 import java.util.HexFormat;
 import org.junit.jupiter.api.Test;
 import org.openidentity.core.StateHash;
+import org.openidentity.core.IdentityState;
+import org.openidentity.cbor.OpenIdentityCborDecoder;
+import org.openidentity.cbor.OpenIdentityCborEncoder;
 
 class StateHashV01ConformanceTest {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -38,6 +41,21 @@ class StateHashV01ConformanceTest {
             byte[] published = HEX.parseHex(vector.path("stateHashHex").asText());
             assertArrayEquals(published, StateHash.fromStateBytes(stateBytes).bytes(), vector.path("id").asText());
             assertEquals(34, published.length);
+        }
+    }
+
+    @Test
+    void sh01ThroughSh10RoundTripThroughSdkModelByteForByte() throws Exception {
+        JsonNode root = JSON.readTree(resourceBytes(RESOURCE));
+        for (JsonNode vector : root.path("vectors")) {
+            byte[] published = HEX.parseHex(vector.path("stateBytesHex").asText());
+            IdentityState decoded = OpenIdentityCborDecoder.decodeState(published);
+            byte[] independentlyEncoded = OpenIdentityCborEncoder.encodeState(decoded);
+            assertArrayEquals(published, independentlyEncoded, vector.path("id").asText());
+            assertArrayEquals(
+                    HEX.parseHex(vector.path("stateHashHex").asText()),
+                    StateHash.fromStateBytes(independentlyEncoded).bytes(),
+                    vector.path("id").asText() + " reconstructed StateHash");
         }
     }
 
