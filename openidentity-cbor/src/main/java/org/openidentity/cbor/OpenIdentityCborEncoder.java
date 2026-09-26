@@ -17,6 +17,26 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
+    public static byte[] encodeState(IdentityStateV2 state) {
+        DeterministicCbor c = new DeterministicCbor();
+        int fields = 5;
+        if (state.recoveryCommitment() != null) fields++;
+        if (state.assertionPolicy() != null) fields++;
+        c.map(fields);
+        c.integer(1); c.integer(2);
+        c.integer(2); c.bytes(state.identity().bytes());
+        c.integer(3); c.unsigned(state.sequence().value());
+        c.integer(4); c.integer(state.status().code());
+        c.integer(5); encodePolicy(c, state.controllerPolicy());
+        if (state.recoveryCommitment() != null) {
+            c.integer(6); c.bytes(state.recoveryCommitment().bytes());
+        }
+        if (state.assertionPolicy() != null) {
+            c.integer(7); encodePolicy(c, state.assertionPolicy());
+        }
+        return c.toByteArray();
+    }
+
     public static byte[] encodeControllerPolicy(ControllerPolicy policy) { DeterministicCbor c = new DeterministicCbor(); encodePolicy(c, policy); return c.toByteArray(); }
 
     public static byte[] encodeVerificationMethod(VerificationMethod method) { DeterministicCbor c = new DeterministicCbor(); encodeMethod(c, method); return c.toByteArray(); }
