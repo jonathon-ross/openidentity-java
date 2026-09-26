@@ -17,7 +17,7 @@ import org.openidentity.cbor.OpenIdentityCborEncoder;
 class StateHashV01ConformanceTest {
     private static final ObjectMapper JSON = new ObjectMapper();
     private static final HexFormat HEX = HexFormat.of();
-    private static final String RESOURCE = "/openidentity-v0.1.0/state-hash-v0.1.json";
+    private static final String RESOURCE = "/openidentity-v0.1.1/state-hash-v0.1.json";
 
     @Test
     void frozenVectorResourceMatchesPublishedChecksum() throws Exception {
