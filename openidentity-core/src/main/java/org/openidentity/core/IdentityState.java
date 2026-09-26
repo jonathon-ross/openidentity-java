@@ -8,19 +8,29 @@ package org.openidentity.core;
  * from the signed operation envelope's protocol version.
  */
 public sealed interface IdentityState permits IdentityStateV1, IdentityStateV2 {
-  /** @return state schema version */
+  /**
+   * @return state schema version
+   */
   int stateVersion();
 
-  /** @return identity governed by this state */
+  /**
+   * @return identity governed by this state
+   */
   IdentityId identity();
 
-  /** @return sequence of the operation that produced this state */
+  /**
+   * @return sequence of the operation that produced this state
+   */
   Sequence sequence();
 
-  /** @return current lifecycle status */
+  /**
+   * @return current lifecycle status
+   */
   IdentityStatus status();
 
-  /** @return controller authority policy */
+  /**
+   * @return controller authority policy
+   */
   ControllerPolicy controllerPolicy();
 
   /**

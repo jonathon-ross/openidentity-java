@@ -119,6 +119,7 @@ public final class CredentialVerifier {
       StateHash issuanceStateHash,
       IdentityState historicalState,
       List<SignatureProof> proofs) {
-    return verifyResult(credentialBytes, issuer, issuanceStateHash, historicalState, proofs).valid();
+    return verifyResult(credentialBytes, issuer, issuanceStateHash, historicalState, proofs)
+        .valid();
   }
 }

@@ -25,12 +25,16 @@ public final class SignatureProof {
     }
   }
 
-  /** @return verification method identifier */
+  /**
+   * @return verification method identifier
+   */
   public VerificationMethodId methodId() {
     return methodId;
   }
 
-  /** @return defensive copy of raw signature bytes */
+  /**
+   * @return defensive copy of raw signature bytes
+   */
   public byte[] signature() {
     return signature.clone();
   }
