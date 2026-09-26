@@ -13,6 +13,7 @@
   <modules>
     <module>openidentity-core</module>
     <module>openidentity-cbor</module>
+    <module>openidentity-crypto</module>
     <module>openidentity-conformance</module>
   </modules>
 
@@ -21,6 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>5.14.0</junit.version>
     <jackson.version>2.20.0</jackson.version>
+    <bouncycastle.version>1.86</bouncycastle.version>
     <maven.compiler.version>3.14.1</maven.compiler.version>
     <maven.surefire.version>3.5.4</maven.surefire.version>
   </properties>
