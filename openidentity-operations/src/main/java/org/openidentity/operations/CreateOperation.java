@@ -6,6 +6,6 @@ public record CreateOperation(IdentityId identity, ControllerPolicy controllerPo
     public CreateOperation { Objects.requireNonNull(identity,"identity"); Objects.requireNonNull(controllerPolicy,"controllerPolicy"); }
     public int protocolVersion(){ return 1; }
     public OperationType operationType(){ return OperationType.CREATE; }
-    public Sequence sequence(){ return new Sequence(1); }
+    public Sequence sequence(){ return new Sequence(java.math.BigInteger.ONE); }
     public byte[] encode(){ return OpenIdentityCborEncoder.encodeCreateOperation(identity,controllerPolicy,recoveryCommitment); }
 }
