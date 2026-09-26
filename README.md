@@ -94,12 +94,6 @@ Before tagging an SDK release, run:
 ./tools/release-gate.sh
 ```
 
-On Windows PowerShell:
-
-```powershell
-mvn clean verify
-git diff --exit-code
-git status --porcelain
-```
+On Windows with Git Bash, the same command is supported. The release gate automatically discovers common Maven installations under the Windows user profile when `mvn` is not already on `PATH`.
 
 The Maven conformance suite independently verifies the SHA-256 manifests for every pinned normative v0.1.1 resource and exercises the protocol, cryptographic, operation, credential, recovery, and W3C projection vectors.
