@@ -76,9 +76,7 @@ public final class OpenIdentityCborDecoder {
     Sequence sequence = new Sequence(integer(operation.get(BigInteger.valueOf(4))));
     Object previousValue = operation.get(BigInteger.valueOf(5));
     StateHash previous =
-        previousValue == null
-            ? null
-            : new StateHash(MultihashSha256.of(bytes(previousValue)));
+        previousValue == null ? null : new StateHash(MultihashSha256.of(bytes(previousValue)));
     Map<Object, Object> payload = map(operation.get(BigInteger.valueOf(6)));
 
     DecodedOperation decoded =
@@ -197,8 +195,7 @@ public final class OpenIdentityCborDecoder {
         controllerPolicy(payload.get(BigInteger.ONE)),
         null,
         recoveryPolicy(payload.get(BigInteger.TWO)),
-        new RecoveryCommitment(
-            MultihashSha256.of(bytes(payload.get(BigInteger.valueOf(3))))));
+        new RecoveryCommitment(MultihashSha256.of(bytes(payload.get(BigInteger.valueOf(3))))));
   }
 
   private static RecoveryPolicy recoveryPolicy(Object value) {
@@ -255,7 +252,8 @@ public final class OpenIdentityCborDecoder {
 
   private static void requireNonCreateEnvelope(Sequence sequence, StateHash previous) {
     if (sequence.value().compareTo(BigInteger.TWO) < 0 || previous == null) {
-      throw new IllegalArgumentException("Non-CREATE operation requires sequence >= 2 and predecessor");
+      throw new IllegalArgumentException(
+          "Non-CREATE operation requires sequence >= 2 and predecessor");
     }
   }
 

@@ -80,7 +80,8 @@ class OperationVectorV01Test {
   void operationDecoderRejectsTrailingBytes() throws Exception {
     byte[] canonical = hex(vector("V02"), "operationBytesHex");
     byte[] trailing = java.util.Arrays.copyOf(canonical, canonical.length + 1);
-    assertThrows(IllegalArgumentException.class, () -> OpenIdentityOperationDecoder.decode(trailing));
+    assertThrows(
+        IllegalArgumentException.class, () -> OpenIdentityOperationDecoder.decode(trailing));
   }
 
   private static byte[] extractNewMlDsaKey(JsonNode v) {
