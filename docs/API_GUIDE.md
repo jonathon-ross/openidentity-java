@@ -2,6 +2,22 @@
 
 This guide describes the public API of `openidentity-java` targeting OpenIdentity Protocol v0.1.1.
 
+## Adding the SDK to an application
+
+During the 0.1.0 release, depend only on the modules your application uses. For example, credential verification typically needs the credentials artifact, whose transitive dependencies provide core, CBOR, and crypto support:
+
+```xml
+<dependency>
+  <groupId>org.openidentity</groupId>
+  <artifactId>openidentity-credentials</artifactId>
+  <version>0.1.0</version>
+</dependency>
+```
+
+State-transition applications can depend on `openidentity-operations`. Do not add `openidentity-conformance` as an application dependency; it exists to validate SDK releases against frozen protocol artifacts.
+
+The coordinates above describe the intended 0.1.0 publication coordinates. Until 0.1.0 is published, build the reactor locally with `mvn clean install`.
+
 ## Modules
 
 - **openidentity-core** — immutable protocol domain types: identities, state, policies, verification methods, StateHash, recovery commitments, and structured errors.
@@ -10,6 +26,25 @@ This guide describes the public API of `openidentity-java` targeting OpenIdentit
 - **openidentity-operations** — CREATE, ROTATE_CONTROLLER, SET_ASSERTION_POLICY, DEACTIVATE, and RECOVER construction and state transitions.
 - **openidentity-credentials** — canonical OI-003 credentials, historical assertion-authority verification, multibase helpers, and deterministic W3C projection.
 - **openidentity-conformance** — release tests against the frozen Protocol v0.1.1 vectors. It is not intended as an application dependency.
+
+## Quick start: verify a credential
+
+A verifier must resolve the exact historical state identified by the signed credential's issuance StateHash before calling the SDK. The SDK intentionally does not perform network resolution itself.
+
+```java
+VerificationResult result = CredentialVerifier.verifyResult(
+        credentialBytes,
+        issuerIdentity,
+        issuanceStateHash,
+        historicalState,
+        proofs);
+
+if (!result.valid()) {
+    throw new IllegalStateException("Credential rejected: " + result.error());
+}
+```
+
+Cryptographic validity is separate from profile validation, validity-period evaluation, credential status/revocation, and application acceptance policy.
 
 ## Core model
 
