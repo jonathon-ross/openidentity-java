@@ -40,7 +40,7 @@ The implementation will be continuously checked against the published OpenIdenti
 - Protocol validation errors are explicit; malformed or unsupported input is not silently normalized.
 - No dependency on the protocol repository's Java vector-generator implementation.
 
-## Planned modules
+## Modules
 
 ```text
 openidentity-core          protocol-domain types and invariants
@@ -51,7 +51,7 @@ openidentity-credentials   native credentials and W3C projection
 openidentity-conformance   tests against Protocol v0.1.1 vectors
 ```
 
-The module boundaries may evolve as the production API becomes clearer, but protocol semantics remain governed by the released specification.
+All modules above are implemented. Protocol semantics remain governed by the released specification.
 
 ## Protocol baseline
 
@@ -68,6 +68,22 @@ spec/cddl/openidentity-operation-v2.cddl
 ```
 
 The schema revision name `v2` is distinct from the signed operation envelope's `protocolVersion = 1`.
+
+## Verification API
+
+Credential verification exposes both a compatibility boolean API and a structured result API:
+
+```java
+VerificationResult result = CredentialVerifier.verifyResult(
+        credentialBytes, issuer, issuanceStateHash, historicalState, proofs);
+
+if (!result.valid()) {
+    OpenIdentityError error = result.error();
+    // Handle stable machine-readable failure code.
+}
+```
+
+State-transition failures use `OpenIdentityException`, whose `error()` method returns the corresponding `OpenIdentityError` code.
 
 ## Build
 
