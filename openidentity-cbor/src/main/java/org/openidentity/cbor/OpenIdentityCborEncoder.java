@@ -67,6 +67,16 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
+    public static byte[] encodeSignatureProof(byte[] methodId, byte[] signature) {
+        if (methodId == null) throw new NullPointerException("methodId");
+        if (signature == null) throw new NullPointerException("signature");
+        DeterministicCbor c = new DeterministicCbor();
+        c.map(2);
+        c.integer(1); c.bytes(methodId);
+        c.integer(2); c.bytes(signature);
+        return c.toByteArray();
+    }
+
     public static byte[] encodeControllerPolicy(ControllerPolicy policy) { DeterministicCbor c = new DeterministicCbor(); encodePolicy(c, policy); return c.toByteArray(); }
 
     public static byte[] encodeVerificationMethod(VerificationMethod method) { DeterministicCbor c = new DeterministicCbor(); encodeMethod(c, method); return c.toByteArray(); }
