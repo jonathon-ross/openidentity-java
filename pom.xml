@@ -9,6 +9,28 @@
   <packaging>pom</packaging>
   <name>OpenIdentity Java SDK</name>
   <description>Production Java SDK for OpenIdentity Protocol v0.1.1.</description>
+  <url>https://github.com/jonathon-ross/openidentity-java</url>
+
+  <licenses>
+    <license>
+      <name>Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Jonathon Ross</name>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/jonathon-ross/openidentity-java.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jonathon-ross/openidentity-java.git</developerConnection>
+    <url>https://github.com/jonathon-ross/openidentity-java</url>
+    <tag>HEAD</tag>
+  </scm>
 
   <modules>
     <module>openidentity-core</module>
@@ -27,6 +49,8 @@
     <bouncycastle.version>1.86</bouncycastle.version>
     <maven.compiler.version>3.14.1</maven.compiler.version>
     <maven.surefire.version>3.5.4</maven.surefire.version>
+    <maven.source.version>3.3.1</maven.source.version>
+    <maven.javadoc.version>3.12.0</maven.javadoc.version>
   </properties>
 
   <dependencyManagement>
@@ -51,6 +75,18 @@
             <release>${maven.compiler.release}</release>
             <compilerArgs><arg>-Xlint:all</arg></compilerArgs>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>${maven.source.version}</version>
+          <executions><execution><id>attach-sources</id><goals><goal>jar-no-fork</goal></goals></execution></executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>${maven.javadoc.version}</version>
+          <executions><execution><id>attach-javadocs</id><goals><goal>jar</goal></goals></execution></executions>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
