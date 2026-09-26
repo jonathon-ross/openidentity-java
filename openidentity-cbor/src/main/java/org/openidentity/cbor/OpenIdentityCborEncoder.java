@@ -119,6 +119,35 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
+    public static byte[] encodeRecoveryPolicy(RecoveryPolicy policy) {
+        DeterministicCbor c = new DeterministicCbor();
+        encodeRecoveryPolicy(c, policy);
+        return c.toByteArray();
+    }
+
+    public static byte[] encodeRecoverOperation(IdentityId identity, Sequence sequence, StateHash previousStateHash, ControllerPolicy newControllerPolicy, RecoveryPolicy currentRecoveryPolicy, RecoveryCommitment newRecoveryCommitment) {
+        DeterministicCbor c = new DeterministicCbor();
+        c.map(6);
+        c.integer(1); c.integer(1);
+        c.integer(2); c.integer(3);
+        c.integer(3); c.bytes(identity.bytes());
+        c.integer(4); c.unsigned(sequence.value());
+        c.integer(5); c.bytes(previousStateHash.bytes());
+        c.integer(6); c.map(3);
+        c.integer(1); encodePolicy(c, newControllerPolicy);
+        c.integer(2); encodeRecoveryPolicy(c, currentRecoveryPolicy);
+        c.integer(3); c.bytes(newRecoveryCommitment.bytes());
+        return c.toByteArray();
+    }
+
+    private static void encodeRecoveryPolicy(DeterministicCbor c, RecoveryPolicy policy) {
+        if (policy.isSingle()) {
+            c.map(3); c.integer(1); c.integer(1); c.integer(2); c.integer(1); c.integer(3); c.array(1); encodeMethod(c, policy.methods().get(0));
+        } else {
+            c.map(4); c.integer(1); c.integer(1); c.integer(2); c.integer(2); c.integer(3); c.integer(policy.threshold()); c.integer(4); c.array(policy.methods().size()); for (VerificationMethod m : policy.methods()) encodeMethod(c, m);
+        }
+    }
+
     public static byte[] encodeSignatureProof(byte[] methodId, byte[] signature) {
         if (methodId == null) throw new NullPointerException("methodId");
         if (signature == null) throw new NullPointerException("signature");
