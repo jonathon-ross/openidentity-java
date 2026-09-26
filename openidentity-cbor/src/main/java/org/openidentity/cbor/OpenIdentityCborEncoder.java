@@ -43,6 +43,30 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
+    public static byte[] encodeOperationSigningInput(String domain, int signingStructureVersion, byte[] operationBytes) {
+        if (domain == null) throw new NullPointerException("domain");
+        if (operationBytes == null) throw new NullPointerException("operationBytes");
+        DeterministicCbor c = new DeterministicCbor();
+        c.array(3);
+        c.text(domain);
+        c.integer(signingStructureVersion);
+        c.bytes(operationBytes);
+        return c.toByteArray();
+    }
+
+    public static byte[] encodeMethodSigningInput(String domain, int signingStructureVersion, byte[] operationBytes, byte[] methodId) {
+        if (domain == null) throw new NullPointerException("domain");
+        if (operationBytes == null) throw new NullPointerException("operationBytes");
+        if (methodId == null) throw new NullPointerException("methodId");
+        DeterministicCbor c = new DeterministicCbor();
+        c.array(4);
+        c.text(domain);
+        c.integer(signingStructureVersion);
+        c.bytes(operationBytes);
+        c.bytes(methodId);
+        return c.toByteArray();
+    }
+
     public static byte[] encodeControllerPolicy(ControllerPolicy policy) { DeterministicCbor c = new DeterministicCbor(); encodePolicy(c, policy); return c.toByteArray(); }
 
     public static byte[] encodeVerificationMethod(VerificationMethod method) { DeterministicCbor c = new DeterministicCbor(); encodeMethod(c, method); return c.toByteArray(); }
