@@ -2,13 +2,13 @@
 
 Production Java SDK for the OpenIdentity Protocol.
 
-This repository implements the frozen OpenIdentity Protocol **v0.1.0** as an independent consumer of the protocol specification and normative conformance artifacts.
+This repository implements the frozen OpenIdentity Protocol **v0.1.1** as an independent consumer of the protocol specification and normative conformance artifacts.
 
 ## Scope
 
 This repository contains production Java implementation code. It does **not** define or modify the OpenIdentity protocol.
 
-The canonical protocol is maintained separately in `jonathon-ross/OpenIdentity`. Protocol v0.1.0 is the initial conformance target.
+The canonical protocol is maintained separately in `jonathon-ross/OpenIdentity`. Protocol v0.1.1 is the initial conformance target.
 
 Product requirements must not silently redefine protocol semantics. If implementation work exposes a genuine protocol deficiency, that issue belongs in the protocol repository for explicit specification/version review.
 
@@ -26,7 +26,7 @@ Identity creation
     -> RECOVER
 ```
 
-The implementation will be continuously checked against the published OpenIdentity Protocol v0.1.0 normative vectors.
+The implementation will be continuously checked against the published OpenIdentity Protocol v0.1.1 normative vectors.
 
 ## Design principles
 
@@ -48,7 +48,7 @@ openidentity-cbor          deterministic encoding/decoding
 openidentity-crypto        keys, signatures, signing domains, proof verification
 openidentity-operations    operation construction and state transitions
 openidentity-credentials   native credentials and W3C projection
-openidentity-conformance   tests against Protocol v0.1.0 vectors
+openidentity-conformance   tests against Protocol v0.1.1 vectors
 ```
 
 The module boundaries may evolve as the production API becomes clearer, but protocol semantics remain governed by the released specification.
@@ -58,7 +58,7 @@ The module boundaries may evolve as the production API becomes clearer, but prot
 Target:
 
 ```text
-OpenIdentity Protocol v0.1.0
+OpenIdentity Protocol v0.1.1
 ```
 
 Current operation schema in that release:
