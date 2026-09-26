@@ -9,8 +9,8 @@ public record VerificationResult(boolean valid, OpenIdentityError error, String 
         if (valid && error != null) throw new IllegalArgumentException("Valid result cannot contain an error");
         if (!valid) Objects.requireNonNull(error, "Invalid result requires an error");
     }
-    public static VerificationResult valid() { return new VerificationResult(true, null, null); }
-    public static VerificationResult invalid(OpenIdentityError error, String detail) {
+    public static VerificationResult success() { return new VerificationResult(true, null, null); }
+    public static VerificationResult failure(OpenIdentityError error, String detail) {
         return new VerificationResult(false, Objects.requireNonNull(error), detail);
     }
     public Optional<OpenIdentityError> errorCode() { return Optional.ofNullable(error); }
