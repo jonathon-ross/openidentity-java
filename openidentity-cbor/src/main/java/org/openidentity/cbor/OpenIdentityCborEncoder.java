@@ -5,6 +5,12 @@ import org.openidentity.core.*;
 public final class OpenIdentityCborEncoder {
     private OpenIdentityCborEncoder() {}
 
+    public static byte[] encodeState(IdentityState state) {
+        if (state instanceof IdentityStateV1 v1) return encodeState(v1);
+        if (state instanceof IdentityStateV2 v2) return encodeState(v2);
+        throw new IllegalArgumentException("Unsupported IdentityState implementation");
+    }
+
     public static byte[] encodeState(IdentityStateV1 state) {
         DeterministicCbor c = new DeterministicCbor();
         c.map(state.recoveryCommitment() == null ? 5 : 6);
