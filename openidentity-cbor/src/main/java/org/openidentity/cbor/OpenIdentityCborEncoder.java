@@ -67,6 +67,33 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
+    public static byte[] encodeCreateOperation(IdentityId identity, ControllerPolicy policy, RecoveryCommitment recoveryCommitment) {
+        DeterministicCbor c = new DeterministicCbor();
+        c.map(6);
+        c.integer(1); c.integer(1);
+        c.integer(2); c.integer(1);
+        c.integer(3); c.bytes(identity.bytes());
+        c.integer(4); c.integer(1);
+        c.integer(5); c.nil();
+        c.integer(6);
+        c.map(recoveryCommitment == null ? 1 : 2);
+        c.integer(1); encodePolicy(c, policy);
+        if (recoveryCommitment != null) { c.integer(2); c.bytes(recoveryCommitment.bytes()); }
+        return c.toByteArray();
+    }
+
+    public static byte[] encodeRotateControllerOperation(IdentityId identity, Sequence sequence, StateHash previousStateHash, ControllerPolicy proposedPolicy) {
+        DeterministicCbor c = new DeterministicCbor();
+        c.map(6);
+        c.integer(1); c.integer(1);
+        c.integer(2); c.integer(2);
+        c.integer(3); c.bytes(identity.bytes());
+        c.integer(4); c.unsigned(sequence.value());
+        c.integer(5); c.bytes(previousStateHash.bytes());
+        c.integer(6); c.map(1); c.integer(1); encodePolicy(c, proposedPolicy);
+        return c.toByteArray();
+    }
+
     public static byte[] encodeSignatureProof(byte[] methodId, byte[] signature) {
         if (methodId == null) throw new NullPointerException("methodId");
         if (signature == null) throw new NullPointerException("signature");
