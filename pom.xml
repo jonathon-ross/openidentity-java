@@ -12,6 +12,7 @@
 
   <modules>
     <module>openidentity-core</module>
+    <module>openidentity-cbor</module>
   </modules>
 
   <properties>
