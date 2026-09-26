@@ -148,6 +148,12 @@ public final class OpenIdentityCborEncoder {
         }
     }
 
+    public static byte[] encodeCredentialSigningInput(byte[] credentialBytes) {
+        DeterministicCbor c = new DeterministicCbor();
+        c.array(3); c.text("OpenIdentity Credential"); c.integer(1); c.bytes(credentialBytes);
+        return c.toByteArray();
+    }
+
     public static byte[] encodeSignatureProof(byte[] methodId, byte[] signature) {
         if (methodId == null) throw new NullPointerException("methodId");
         if (signature == null) throw new NullPointerException("signature");
