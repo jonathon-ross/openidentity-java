@@ -29,6 +29,16 @@ class SignatureEnvelopeV01Test {
     }
 
     @Test
+    void se01AuthorizationProofMatchesFrozenVector() {
+        SignatureProof proof = new SignatureProof(
+                VerificationMethodId.of(h("000102030405060708090a0b0c0d0e0f")),
+                h("cb88120653060470be999a194f766d31c7b11871af89491ef2ad3030e2c1540d570076913cf94ac72eb1ccf450aa83afa2fd9481041daa7af2cc09e9d93abd0e"));
+        assertArrayEquals(
+                h("a20150000102030405060708090a0b0c0d0e0f025840cb88120653060470be999a194f766d31c7b11871af89491ef2ad3030e2c1540d570076913cf94ac72eb1ccf450aa83afa2fd9481041daa7af2cc09e9d93abd0e"),
+                proof.encode());
+    }
+
+    @Test
     void domainsAreCryptographicallySeparated() {
         byte[] operation = h("a601010202035820000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f0402055822122091584ca3a54ebcf93d77c38ea09f68d33c99d6565c7aefab008bd11c09f5efa306a101a201010281a20150202122232425262728292a2b2c2d2e2f02a40101032720062158202543b92ff1095511476adc8369db6ddc933665a11978dda1404ee1066ca9559d");
         VerificationMethodId id = VerificationMethodId.of(h("000102030405060708090a0b0c0d0e0f"));
