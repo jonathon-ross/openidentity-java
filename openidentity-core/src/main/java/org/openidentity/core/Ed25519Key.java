@@ -39,7 +39,9 @@ public final class Ed25519Key implements CoseKey {
     return -8;
   }
 
-  /** @return COSE Ed25519 curve value */
+  /**
+   * @return COSE Ed25519 curve value
+   */
   public int coseCurve() {
     return 6;
   }

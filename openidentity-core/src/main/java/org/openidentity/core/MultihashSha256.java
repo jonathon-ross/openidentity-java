@@ -51,7 +51,9 @@ public final class MultihashSha256 {
     return new MultihashSha256(value.clone());
   }
 
-  /** @return defensive copy of complete Multihash bytes */
+  /**
+   * @return defensive copy of complete Multihash bytes
+   */
   public byte[] bytes() {
     return bytes.clone();
   }

@@ -11,16 +11,24 @@ public sealed interface OpenIdentityOperation
         SetAssertionPolicyOperation,
         DeactivateOperation,
         RecoverOperation {
-  /** @return signed operation-envelope protocol version */
+  /**
+   * @return signed operation-envelope protocol version
+   */
   int protocolVersion();
 
-  /** @return operation registry type */
+  /**
+   * @return operation registry type
+   */
   OperationType operationType();
 
-  /** @return identity affected by the operation */
+  /**
+   * @return identity affected by the operation
+   */
   IdentityId identity();
 
-  /** @return operation sequence */
+  /**
+   * @return operation sequence
+   */
   Sequence sequence();
 
   /**
