@@ -94,6 +94,19 @@ public final class OpenIdentityCborEncoder {
         return c.toByteArray();
     }
 
+    public static byte[] encodeSetAssertionPolicyOperation(IdentityId identity, Sequence sequence, StateHash previousStateHash, AssertionPolicy assertionPolicy) {
+        DeterministicCbor c = new DeterministicCbor();
+        c.map(6);
+        c.integer(1); c.integer(1);
+        c.integer(2); c.integer(5);
+        c.integer(3); c.bytes(identity.bytes());
+        c.integer(4); c.unsigned(sequence.value());
+        c.integer(5); c.bytes(previousStateHash.bytes());
+        c.integer(6); c.map(1); c.integer(1);
+        if (assertionPolicy == null) c.nil(); else encodePolicy(c, assertionPolicy);
+        return c.toByteArray();
+    }
+
     public static byte[] encodeSignatureProof(byte[] methodId, byte[] signature) {
         if (methodId == null) throw new NullPointerException("methodId");
         if (signature == null) throw new NullPointerException("signature");
