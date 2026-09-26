@@ -24,8 +24,15 @@ final class CborReader {
       case 2 -> bytes(exactInt(argument(ai)));
       case 4 -> array(exactInt(argument(ai)));
       case 5 -> map(exactInt(argument(ai)));
+      case 7 -> simple(ai);
       default -> throw new IllegalArgumentException("Unsupported CBOR major type: " + major);
     };
+  }
+
+  private Object simple(int additionalInformation) {
+    if (additionalInformation == 22) return null;
+    throw new IllegalArgumentException(
+        "Unsupported CBOR simple value: " + additionalInformation);
   }
 
   boolean exhausted() {
