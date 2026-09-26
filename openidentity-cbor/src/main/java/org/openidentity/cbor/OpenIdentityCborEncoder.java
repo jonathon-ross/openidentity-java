@@ -148,6 +148,42 @@ public final class OpenIdentityCborEncoder {
         }
     }
 
+    public static byte[] encodeCredential(byte[] credentialId, IdentityId issuer, StateHash issuanceStateHash, long validFrom, Long validUntil, String profile, byte[] subject, java.util.Map<String,Object> claims) {
+        DeterministicCbor c = new DeterministicCbor();
+        c.map(validUntil == null ? 8 : 9);
+        c.integer(1); c.integer(1);
+        c.integer(2); c.bytes(credentialId);
+        c.integer(3); c.bytes(issuer.bytes());
+        c.integer(4); c.bytes(issuanceStateHash.bytes());
+        c.integer(5); c.unsigned(java.math.BigInteger.valueOf(validFrom));
+        if (validUntil != null) { c.integer(6); c.unsigned(java.math.BigInteger.valueOf(validUntil)); }
+        c.integer(7); c.text(profile);
+        c.integer(8); c.bytes(subject);
+        c.integer(9); encodeClaimMap(c, claims);
+        return c.toByteArray();
+    }
+
+    private static void encodeClaimMap(DeterministicCbor c, java.util.Map<String,Object> map) {
+        java.util.List<java.util.Map.Entry<String,Object>> entries = new java.util.ArrayList<>(map.entrySet());
+        entries.sort((a,b) -> compareCborTextKeys(a.getKey(), b.getKey()));
+        c.map(entries.size());
+        for (var e : entries) { c.text(e.getKey()); encodeClaimValue(c, e.getValue()); }
+    }
+    private static int compareCborTextKeys(String a, String b) {
+        byte[] x=a.getBytes(java.nio.charset.StandardCharsets.UTF_8), y=b.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        int hx=x.length<24?1:x.length<=255?2:x.length<=65535?3:5, hy=y.length<24?1:y.length<=255?2:y.length<=65535?3:5;
+        int lx=hx+x.length, ly=hy+y.length; if(lx!=ly)return Integer.compare(lx,ly);
+        for(int i=0;i<Math.min(x.length,y.length);i++){int d=Integer.compare(x[i]&255,y[i]&255);if(d!=0)return d;} return Integer.compare(x.length,y.length);
+    }
+    @SuppressWarnings("unchecked")
+    private static void encodeClaimValue(DeterministicCbor c, Object v) {
+        if(v==null){c.nil();return;} if(v instanceof String s){c.text(s);return;} if(v instanceof byte[] b){c.bytes(b);return;} if(v instanceof Boolean b){c.bool(b);return;}
+        if(v instanceof Byte||v instanceof Short||v instanceof Integer||v instanceof Long||v instanceof java.math.BigInteger){java.math.BigInteger n=v instanceof java.math.BigInteger bi?bi:java.math.BigInteger.valueOf(((Number)v).longValue());c.number(n);return;}
+        if(v instanceof java.util.List<?> a){c.array(a.size());for(Object x:a)encodeClaimValue(c,x);return;}
+        if(v instanceof java.util.Map<?,?> m){java.util.Map<String,Object> s=new java.util.HashMap<>();for(var e:m.entrySet()){if(!(e.getKey() instanceof String k))throw new IllegalArgumentException("Claim map keys must be text");s.put(k,e.getValue());}encodeClaimMap(c,s);return;}
+        throw new IllegalArgumentException("Unsupported credential claim value: "+v.getClass().getName());
+    }
+
     public static byte[] encodeCredentialSigningInput(byte[] credentialBytes) {
         DeterministicCbor c = new DeterministicCbor();
         c.array(3); c.text("OpenIdentity Credential"); c.integer(1); c.bytes(credentialBytes);
