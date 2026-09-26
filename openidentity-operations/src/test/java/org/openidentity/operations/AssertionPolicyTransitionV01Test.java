@@ -30,6 +30,41 @@ class AssertionPolicyTransitionV01Test {
   JsonNode v=valid("A01");SetAssertionPolicyOperation op=op(v,singleAssertion(v));List<SignatureProof> auth=controllerProofs(v);
   assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),op,List.of(auth.get(0)),assertionPops(v)));
  }
+ @Test void ai03InvalidAssertionPopFails()throws Exception{
+  JsonNode v=valid("A01");List<SignatureProof> pops=assertionPops(v);byte[] bad=pops.get(0).signature();bad[0]^=1;
+  assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),op(v,singleAssertion(v)),controllerProofs(v),List.of(new SignatureProof(pops.get(0).methodId(),bad))));
+ }
+ @Test void ai04WrongAssertionMethodIdFails()throws Exception{
+  JsonNode v=valid("A01");SignatureProof p=assertionPops(v).get(0);VerificationMethodId wrong=VerificationMethodId.of(H.parseHex("404142434445464748494a4b4c4d4e4f"));
+  assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),op(v,singleAssertion(v)),controllerProofs(v),List.of(new SignatureProof(wrong,p.signature()))));
+ }
+ @Test void ai05InvalidPreviousStateHashFails()throws Exception{
+  JsonNode v=valid("A01");byte[] bad=hex(v,"previousStateHashHex");bad[33]^=1;
+  SetAssertionPolicyOperation badOp=new SetAssertionPolicyOperation(IdentityId.of(hex(v,"identityHex")),new Sequence(BigInteger.TWO),new StateHash(MultihashSha256.of(bad)),singleAssertion(v));
+  assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),badOp,controllerProofs(v),assertionPops(v)));
+ }
+ @Test void ai06InvalidSequenceFails()throws Exception{
+  JsonNode v=valid("A01");SetAssertionPolicyOperation badOp=new SetAssertionPolicyOperation(IdentityId.of(hex(v,"identityHex")),new Sequence(BigInteger.valueOf(3)),new StateHash(MultihashSha256.of(hex(v,"previousStateHashHex"))),singleAssertion(v));
+  assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),badOp,controllerProofs(v),assertionPops(v)));
+ }
+ @Test void ai07InvalidControllerSignatureFails()throws Exception{
+  JsonNode v=valid("A01");List<SignatureProof> auth=controllerProofs(v);byte[] bad=auth.get(0).signature();bad[0]^=1;
+  List<SignatureProof> changed=List.of(new SignatureProof(auth.get(0).methodId(),bad),auth.get(1));
+  assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),op(v,singleAssertion(v)),changed,assertionPops(v)));
+ }
+ @Test void ai08DuplicateAssertionMethodRejectedAtPolicyConstruction()throws Exception{
+  JsonNode v=valid("A01");VerificationMethod m=new VerificationMethod(VerificationMethodId.of(hex(v,"assertionEd25519MethodIdHex")),Ed25519Key.of(hex(v,"assertionEd25519PublicKeyHex")));
+  assertThrows(IllegalArgumentException.class,()->new AssertionPolicy(1,List.of(m,m)));
+ }
+ @Test void ai09InvalidAssertionThresholdRejectedAtPolicyConstruction()throws Exception{
+  JsonNode v=valid("A01");VerificationMethod m=new VerificationMethod(VerificationMethodId.of(hex(v,"assertionEd25519MethodIdHex")),Ed25519Key.of(hex(v,"assertionEd25519PublicKeyHex")));
+  assertThrows(IllegalArgumentException.class,()->new AssertionPolicy(2,List.of(m)));
+ }
+ @Test void ai10SetAssertionPolicyFromV2AlwaysProducesV2()throws Exception{
+  JsonNode v=valid("A02"),src=valid("A01");IdentityStateV2 current=v2Source(v,src);
+  IdentityStateV2 result=SetAssertionPolicyTransition.apply(current,op(v,singleAssertion(v)),controllerProofs(v),assertionPops(v));
+  assertEquals(2,result.stateVersion());
+ }
  @Test void ai02MissingAssertionPopFails()throws Exception{
   JsonNode v=valid("A01");assertThrows(IllegalArgumentException.class,()->SetAssertionPolicyTransition.apply(v1Source(v),op(v,singleAssertion(v)),controllerProofs(v),List.of()));
  }
