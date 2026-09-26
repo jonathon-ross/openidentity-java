@@ -15,6 +15,11 @@ import org.openidentity.crypto.MlDsa65;
 import org.openidentity.crypto.SigningInputs;
 import org.openidentity.core.Ed25519Key;
 import org.openidentity.core.VerificationMethodId;
+import org.openidentity.core.VerificationMethod;
+import org.openidentity.core.ControllerPolicy;
+import org.openidentity.crypto.SignatureProof;
+import org.openidentity.crypto.PolicyVerifier;
+import java.util.List;
 
 class CryptoV01ConformanceTest {
     private static final ObjectMapper JSON = new ObjectMapper();
@@ -104,6 +109,42 @@ class CryptoV01ConformanceTest {
         Ed25519Key key = Ed25519Key.of(hex(se01, "controllerPublicKeyHex"));
         byte[] mutated = hex(v, "mutatedSigningInputHex");
         assertFalse(Ed25519.verify(key, mutated, hex(v, "authorizationSignatureHex")));
+    }
+
+    @Test
+    void v02HybridPolicyRequiresBothEd25519AndMlDsa65Proofs() throws Exception {
+        JsonNode v = vector("V02");
+        byte[] signingInput = hex(v, "signingInputHex");
+
+        VerificationMethod ed = new VerificationMethod(
+                VerificationMethodId.of(hex(v, "ed25519MethodIdHex")),
+                Ed25519Key.of(hex(v, "ed25519PublicKeyHex")));
+        VerificationMethod ml = new VerificationMethod(
+                VerificationMethodId.of(hex(v, "mlDsa65MethodIdHex")),
+                MlDsa65Key.of(hex(v, "mlDsa65PublicKeyHex")));
+
+        ControllerPolicy policy = new ControllerPolicy(2, List.of(ed, ml));
+        SignatureProof edProof = new SignatureProof(ed.id(), hex(v, "ed25519SignatureHex"));
+        SignatureProof mlProof = new SignatureProof(ml.id(), hex(v, "mlDsa65SignatureHex"));
+
+        assertTrue(PolicyVerifier.verify(policy, signingInput, List.of(edProof, mlProof)));
+        assertFalse(PolicyVerifier.verify(policy, signingInput, List.of(edProof)));
+        assertFalse(PolicyVerifier.verify(policy, signingInput, List.of(mlProof)));
+    }
+
+    @Test
+    void v02HybridPolicyRejectsDuplicateProofInsteadOfWeakeningThreshold() throws Exception {
+        JsonNode v = vector("V02");
+        byte[] signingInput = hex(v, "signingInputHex");
+        VerificationMethod ed = new VerificationMethod(
+                VerificationMethodId.of(hex(v, "ed25519MethodIdHex")),
+                Ed25519Key.of(hex(v, "ed25519PublicKeyHex")));
+        VerificationMethod ml = new VerificationMethod(
+                VerificationMethodId.of(hex(v, "mlDsa65MethodIdHex")),
+                MlDsa65Key.of(hex(v, "mlDsa65PublicKeyHex")));
+        ControllerPolicy policy = new ControllerPolicy(2, List.of(ed, ml));
+        SignatureProof edProof = new SignatureProof(ed.id(), hex(v, "ed25519SignatureHex"));
+        assertFalse(PolicyVerifier.verify(policy, signingInput, List.of(edProof, edProof)));
     }
 
     private static JsonNode signatureVector(JsonNode root, String id) {
