@@ -2,6 +2,18 @@
 
 All notable SDK changes are documented here.
 
+## 0.1.1 — 2026-09-26
+
+Patch release adding canonical operation decoding for resolver and service integrations.
+
+- Added `OpenIdentityOperationDecoder.decode(byte[])`.
+- Added module-neutral `DecodedOperation` CBOR representation to preserve module layering.
+- Added canonical CBOR null decoding required by CREATE and assertion-policy removal.
+- Decoder rejects unsupported versions/types, invalid envelope/payload shapes, trailing bytes, and non-canonical re-encodings.
+- Added frozen-vector round-trip coverage for CREATE and ROTATE_CONTROLLER.
+- No protocol semantics, normative bytes, or transition rules changed.
+- Targets OpenIdentity Protocol v0.1.1.
+
 ## 0.1.0 — 2026-09-26
 
 Initial production release of the OpenIdentity Java SDK, targeting the frozen **OpenIdentity Protocol v0.1.1**.
