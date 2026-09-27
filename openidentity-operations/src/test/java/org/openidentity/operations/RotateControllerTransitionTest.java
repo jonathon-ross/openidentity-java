@@ -52,7 +52,8 @@ class RotateControllerTransitionTest {
 
   @Test
   void rotatePreservesV2AssertionPolicy() throws Exception {
-    java.security.KeyPairGenerator generator = java.security.KeyPairGenerator.getInstance("Ed25519");
+    java.security.KeyPairGenerator generator =
+        java.security.KeyPairGenerator.getInstance("Ed25519");
     java.security.KeyPair oldKey = generator.generateKeyPair();
     java.security.KeyPair newKey = generator.generateKeyPair();
 
@@ -72,7 +73,8 @@ class RotateControllerTransitionTest {
 
     IdentityStateV2 current =
         new IdentityStateV2(
-            IdentityId.of(H.parseHex("303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f")),
+            IdentityId.of(
+                H.parseHex("303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f")),
             Sequence.of(1),
             IdentityStatus.ACTIVE,
             ControllerPolicy.single(oldMethod),
@@ -87,10 +89,7 @@ class RotateControllerTransitionTest {
             current.identity(), Sequence.of(2), predecessor, ControllerPolicy.single(newMethod));
 
     SignatureProof authorization =
-        sign(
-            oldMethod.id(),
-            oldKey,
-            SigningInputs.operation(operation.encode()));
+        sign(oldMethod.id(), oldKey, SigningInputs.operation(operation.encode()));
     SignatureProof possession =
         sign(
             newMethod.id(),

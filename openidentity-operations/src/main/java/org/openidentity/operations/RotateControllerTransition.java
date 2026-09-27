@@ -77,7 +77,9 @@ public final class RotateControllerTransition {
         current.recoveryCommitment());
   }
 
-  /** Computes the StateHash of {@link #apply(IdentityState, RotateControllerOperation, List, List)}. */
+  /**
+   * Computes the StateHash of {@link #apply(IdentityState, RotateControllerOperation, List, List)}.
+   */
   public static StateHash resultingStateHash(
       IdentityState current,
       RotateControllerOperation operation,
