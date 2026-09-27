@@ -2,6 +2,17 @@
 
 All notable SDK changes are documented here.
 
+## 0.1.2 — 2026-09-26
+
+Patch release fixing controller rotation for IdentityState v2.
+
+- `RotateControllerTransition.apply` now accepts the `IdentityState` abstraction.
+- ROTATE_CONTROLLER preserves the predecessor state schema version.
+- v2 rotation preserves the existing AssertionPolicy and RecoveryCommitment while replacing only ControllerPolicy.
+- Added an end-to-end Ed25519 v2 rotation regression test covering current-controller authorization and proposed-controller proof of possession.
+- No protocol wire format or normative artifact changed.
+- Targets OpenIdentity Protocol v0.1.1.
+
 ## 0.1.1 — 2026-09-26
 
 Patch release adding canonical operation decoding for resolver and service integrations.
