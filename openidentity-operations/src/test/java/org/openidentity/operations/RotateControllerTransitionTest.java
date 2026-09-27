@@ -52,47 +52,78 @@ class RotateControllerTransitionTest {
 
   @Test
   void rotatePreservesV2AssertionPolicy() throws Exception {
-    JsonNode v = vector("V04");
-    ControllerPolicy oldp = policy(v, "old");
-    ControllerPolicy newp = policy(v, "new");
+    java.security.KeyPairGenerator generator = java.security.KeyPairGenerator.getInstance("Ed25519");
+    java.security.KeyPair oldKey = generator.generateKeyPair();
+    java.security.KeyPair newKey = generator.generateKeyPair();
+
+    VerificationMethod oldMethod =
+        new VerificationMethod(
+            VerificationMethodId.of(H.parseHex("000102030405060708090a0b0c0d0e0f")),
+            Ed25519Key.of(rawEd25519((java.security.interfaces.EdECPublicKey) oldKey.getPublic())));
+    VerificationMethod newMethod =
+        new VerificationMethod(
+            VerificationMethodId.of(H.parseHex("101112131415161718191a1b1c1d1e1f")),
+            Ed25519Key.of(rawEd25519((java.security.interfaces.EdECPublicKey) newKey.getPublic())));
     AssertionPolicy assertion =
         AssertionPolicy.single(
             new VerificationMethod(
-                VerificationMethodId.of(
-                    H.parseHex("404142434445464748494a4b4c4d4e4f")),
-                Ed25519Key.of(
-                    H.parseHex(
-                        "03a107bff3ce10be1d70dd18e74bc09967e4d6309ba50d5f1ddc8664125531b8"))));
+                VerificationMethodId.of(H.parseHex("202122232425262728292a2b2c2d2e2f")),
+                oldMethod.key()));
 
     IdentityStateV2 current =
         new IdentityStateV2(
-            IdentityId.of(hex(v, "identityHex")),
+            IdentityId.of(H.parseHex("303132333435363738393a3b3c3d3e3f404142434445464748494a4b4c4d4e4f")),
             Sequence.of(1),
             IdentityStatus.ACTIVE,
-            oldp,
+            ControllerPolicy.single(oldMethod),
             null,
             assertion);
 
     StateHash predecessor =
         StateHash.fromStateBytes(
             org.openidentity.cbor.OpenIdentityCborEncoder.encodeState(current));
-    RotateControllerOperation op =
-        new RotateControllerOperation(current.identity(), Sequence.of(2), predecessor, newp);
+    RotateControllerOperation operation =
+        new RotateControllerOperation(
+            current.identity(), Sequence.of(2), predecessor, ControllerPolicy.single(newMethod));
 
-    // V04 signatures bind a different predecessor state, so this test isolates state-version
-    // preservation after transition authorization by using the frozen v1 test for cryptography.
-    // Construction below asserts the intended result-shape helper semantics directly.
-    IdentityStateV2 expected =
-        new IdentityStateV2(
-            current.identity(),
-            op.sequence(),
-            IdentityStatus.ACTIVE,
-            newp,
-            current.recoveryCommitment(),
-            assertion);
-    assertSame(assertion, expected.assertionPolicy());
-    assertEquals(2, expected.stateVersion());
-    assertEquals(newp, expected.controllerPolicy());
+    SignatureProof authorization =
+        sign(
+            oldMethod.id(),
+            oldKey,
+            SigningInputs.operation(operation.encode()));
+    SignatureProof possession =
+        sign(
+            newMethod.id(),
+            newKey,
+            SigningInputs.controllerProof(operation.encode(), newMethod.id()));
+
+    IdentityState result =
+        RotateControllerTransition.apply(
+            current, operation, List.of(authorization), List.of(possession));
+
+    IdentityStateV2 v2 = assertInstanceOf(IdentityStateV2.class, result);
+    assertEquals(assertion, v2.assertionPolicy());
+    assertEquals(operation.proposedControllerPolicy(), v2.controllerPolicy());
+    assertEquals(Sequence.of(2), v2.sequence());
+  }
+
+  private static SignatureProof sign(
+      VerificationMethodId methodId, java.security.KeyPair keyPair, byte[] input) throws Exception {
+    java.security.Signature signer = java.security.Signature.getInstance("Ed25519");
+    signer.initSign(keyPair.getPrivate());
+    signer.update(input);
+    return new SignatureProof(methodId, signer.sign());
+  }
+
+  private static byte[] rawEd25519(java.security.interfaces.EdECPublicKey publicKey) {
+    java.security.spec.EdECPoint point = publicKey.getPoint();
+    byte[] y = point.getY().toByteArray();
+    byte[] encoded = new byte[32];
+    for (int i = 0; i < Math.min(y.length, 32); i++) {
+      encoded[i] = y[y.length - 1 - i];
+    }
+    if (point.isXOdd()) encoded[31] |= (byte) 0x80;
+    return encoded;
   }
 
   @Test
