@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.openidentity</groupId>
   <artifactId>openidentity-java</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
   <packaging>pom</packaging>
   <name>OpenIdentity Java SDK</name>
-  <description>Production Java SDK for OpenIdentity Protocol v0.1.1.</description>
+  <description>Production Java SDK for OpenIdentity Protocol v0.1.2.</description>
   <url>https://github.com/jonathon-ross/openidentity-java</url>
 
   <licenses>
