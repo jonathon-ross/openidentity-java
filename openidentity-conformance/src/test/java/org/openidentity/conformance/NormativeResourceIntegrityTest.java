@@ -14,6 +14,7 @@ class NormativeResourceIntegrityTest {
   record Artifact(String file, String manifest) {}
 
   static final Artifact[] ARTIFACTS = {
+    new Artifact("identity-id-v0.1.json", "identity-id-v0.1.sha256"),
     new Artifact("state-hash-v0.1.json", "state-hash-v0.1.json.sha256"),
     new Artifact("cryptographic-agility-v0.1.json", "cryptographic-agility-v0.1.sha256"),
     new Artifact("signature-envelope-v0.1.json", "signature-envelope-v0.1.json.sha256"),
@@ -25,7 +26,7 @@ class NormativeResourceIntegrityTest {
   };
 
   @Test
-  void allPinnedProtocolV011ResourcesMatchPublishedSha256() throws Exception {
+  void allPinnedProtocolV011ResourcesMatchAuthoritativeSha256() throws Exception {
     for (Artifact artifact : ARTIFACTS) {
       byte[] data = read(artifact.file());
       byte[] manifest = read(artifact.manifest());
